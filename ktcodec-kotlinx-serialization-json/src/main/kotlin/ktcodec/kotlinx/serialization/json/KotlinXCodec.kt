@@ -1,3 +1,5 @@
+package ktcodec.kotlinx.serialization.json
+
 import dev.forkhandles.tuples.tuple
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json

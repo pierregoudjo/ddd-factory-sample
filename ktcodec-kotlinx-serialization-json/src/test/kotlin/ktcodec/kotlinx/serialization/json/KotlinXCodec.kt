@@ -1,3 +1,5 @@
+package ktcodec.kotlinx.serialization.json
+
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
