@@ -4,7 +4,6 @@ import model.Employee
 import model.CarPartPackages
 import model.CarModel
 
-
 sealed class FactoryDomainEvent
 
 data class CurseWordUttered(val curse: Curse) : FactoryDomainEvent() {

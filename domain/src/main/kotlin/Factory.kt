@@ -40,3 +40,8 @@ fun decide(command: FactoryCommand, factory: Factory): Either<String, List<Facto
     is TransferShipmentToCargoBay -> transferShipmentToCargoBay(command.shipment, factory)
     is UnpackAndInventoryShipmentInCargoBay -> unpackAndInventoryShipmentInCargoBay(command.employee, factory)
 }
+
+fun fold(events: List<FactoryDomainEvent>, command: FactoryCommand): Either<String, List<FactoryDomainEvent>> {
+    val factory = events.fold(Factory.empty) { acc, curr -> evolve(curr, acc) }
+    return decide(command, factory)
+}
