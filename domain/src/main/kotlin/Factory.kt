@@ -1,3 +1,4 @@
+import arrow.core.Either
 import internal.addShipment
 import internal.registerEmployee
 import internal.unpackShipment
@@ -33,7 +34,7 @@ fun evolve(event: FactoryDomainEvent, factory: Factory): Factory = when (event) 
     is ShipmentUnpackedInCargoBay -> unpackShipment(event.carPartPackages, event.employee, factory)
 }
 
-fun decide(command: FactoryCommand, factory: Factory): List<FactoryDomainEvent> = when (command) {
+fun decide(command: FactoryCommand, factory: Factory): Either<String, List<FactoryDomainEvent>> = when (command) {
     is AssignEmployeeToFactory -> assignEmployeeToFactory(command.employee, factory)
     is ProduceCar -> produceCar(command.employee, command.carModel, factory)
     is TransferShipmentToCargoBay -> transferShipmentToCargoBay(command.shipment, factory)

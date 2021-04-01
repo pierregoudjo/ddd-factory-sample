@@ -1,3 +1,5 @@
+import arrow.core.Either
+
 internal fun doPaperWork(workName: String) {
     println(" > Work: Papers... $workName ...")
 }
@@ -10,9 +12,13 @@ internal fun echoCommand(message: String) {
     println("?> Command: $message".yellow())
 }
 
-internal fun fail(message: String) {
+internal fun fail(message: String): Either.Left<String> {
     println(":> $message".red())
-    throw IllegalStateException(message)
+    return Either.Left(message)
+}
+
+internal fun <Element> success(element: Element): Either.Right<Element> {
+    return Either.Right(element)
 }
 
 internal fun String.red() = "\u001B[41m$this\u001B[0m"

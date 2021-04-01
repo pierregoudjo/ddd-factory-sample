@@ -1,4 +1,6 @@
-import io.kotest.assertions.throwables.shouldThrow
+import arrow.core.Either
+import io.kotest.assertions.arrow.either.shouldBeLeft
+import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.string.shouldContain
 import model.CarPart
@@ -14,7 +16,7 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
 
         Scenario("Order given non-assigned employee to the factory to unpack shipments in the cargo bay") {
             lateinit var currentEvents: List<FactoryDomainEvent>
-            lateinit var exception: Throwable
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
             Given("Chewbacca assigned to the factory and 1 shipment transferred in the cargo bay") {
                 currentEvents = listOf(
                     EmployeeAssignedToFactory(Employee("Chewbacca")),
@@ -25,23 +27,24 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
                         )
                     )
                 )
-
             }
             When("There is an order given to Yoda to unpack shipments in the cargo bay, There should be an error") {
-                exception = shouldThrow<IllegalStateException> {
+                resultingEvents =
                     fold(currentEvents, UnpackAndInventoryShipmentInCargoBay(Employee("Yoda")))
-                }
 
             }
+            Then("There should be an error") {
+                resultingEvents.shouldBeLeft()
+            }
             Then("The error should contains \"Yoda must be assigned to the factory\"") {
-                exception.message shouldContain "Yoda must be assigned to the factory"
+                resultingEvents.mapLeft { it shouldContain "Yoda must be assigned to the factory" }
 
             }
         }
 
         Scenario("No employee assigned to the factory to unpack the cargo bay") {
-            lateinit var exception: Throwable
             lateinit var currentEvents: List<FactoryDomainEvent>
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
             Given("No employee assigned to the factory and 1 shipment transferred to the cargo bay") {
                 currentEvents = listOf(
                     ShipmentTransferredToCargoBay(
@@ -53,14 +56,17 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
                 )
 
             }
-            When("There is an order given to Yoda to unpack shipments in the cargo bay, There should be an error") {
-                exception = shouldThrow<IllegalStateException> {
+            When("There is an order given to Yoda to unpack shipments in the cargo bay") {
+                resultingEvents =
                     fold(currentEvents, UnpackAndInventoryShipmentInCargoBay(Employee("Yoda")))
-                }
+            }
+
+            Then("There should be an error") {
+                resultingEvents.shouldBeLeft()
             }
 
             Then("The error should contains \"Yoda must be assigned to the factory\"") {
-                exception.message shouldContain "Yoda must be assigned to the factory"
+                resultingEvents.mapLeft { it shouldContain "Yoda must be assigned to the factory" }
             }
         }
 
@@ -68,30 +74,33 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
             "There must be at least 1 shipment in the cargo bay when the employee" +
                     " is ordered to unpack the shipments in the cargo bay"
         ) {
-            lateinit var exception: Throwable
-            lateinit var state: List<FactoryDomainEvent>
+            lateinit var currentEvents: List<FactoryDomainEvent>
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
             Given("Chewbacca assigned to the factory") {
-                state = listOf(
+                currentEvents = listOf(
                     EmployeeAssignedToFactory(Employee("Chewbacca")),
                 )
 
             }
 
-            When("an order is given to Chewbacca to unpack shipments in the cargo bay, There should be an error") {
-                exception = shouldThrow<IllegalStateException> {
-                    fold(state, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
-                }
+            When("an order is given to Chewbacca to unpack shipments in the cargo bay") {
+                resultingEvents =
+                    fold(currentEvents, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
+            }
+
+            Then("There should be an error") {
+                resultingEvents.shouldBeLeft()
             }
 
             Then("The error should contains \"There should be a shipment to unpack\"") {
-                exception.message shouldContain "There should be a shipment to unpack"
+                resultingEvents.mapLeft { it shouldContain "There should be a shipment to unpack" }
             }
         }
 
         Scenario("Order an assigned employee to unpack a shipment in the cargo bay") {
 
-            lateinit var events: List<FactoryDomainEvent>
             lateinit var currentEvents: List<FactoryDomainEvent>
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
 
             Given(
                 "Chewbacca assigned to the factory and there is a shipment of 4 chassis transferred to the cargo bay"
@@ -109,25 +118,27 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
             }
 
             When("There is an order given to Chewbacca to unpack the cargo bay") {
-                events = fold(currentEvents, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
+                resultingEvents =
+                    fold(currentEvents, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
             }
 
             Then("Chewbacca unpacked shipment in the cargo bay") {
-                events shouldContain ShipmentUnpackedInCargoBay(
+                resultingEvents.shouldBeRight()
+                resultingEvents.map { it shouldContain ShipmentUnpackedInCargoBay(
                     Employee("Chewbacca"),
                     listOf(CarPartPackage(CarPart("chassis"), 4))
-                )
+                ) }
             }
         }
 
         Scenario("Order an assigned employee to unpack two shipments in the cargo bay") {
             lateinit var currentEvents: List<FactoryDomainEvent>
-            lateinit var state: List<FactoryDomainEvent>
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
             Given(
                 "Chewbacca assigned to the factory and there is a shipment of 4 chassis " +
                         "and another shipment of 2 wheels and 3 engines in the cargo bay"
             ) {
-                state = listOf(
+                currentEvents = listOf(
                     EmployeeAssignedToFactory(Employee("Chewbacca")),
                     ShipmentTransferredToCargoBay(
                         Shipment(
@@ -148,24 +159,24 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
             }
 
             When("There is an order given to Chewbacca to unpack shipment the cargo bay") {
-                currentEvents = fold(state, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
+                resultingEvents = fold(currentEvents, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
 
             }
 
             Then("Chewbacca unpack 3 chassis, 2 wheel and 3 engines") {
-                currentEvents shouldContain ShipmentUnpackedInCargoBay(
+                resultingEvents.map { it shouldContain ShipmentUnpackedInCargoBay(
                     Employee("Chewbacca"), listOf(
                         CarPartPackage(CarPart("chassis"), 4),
                         CarPartPackage(CarPart("wheel"), 2),
                         CarPartPackage(CarPart("engine"), 3),
                     )
-                )
+                ) }
             }
         }
 
         Scenario("Order an assigned employee to unpack two shipments with common items from the cargo bay") {
-            lateinit var events: List<FactoryDomainEvent>
             lateinit var state: List<FactoryDomainEvent>
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
             Given(
                 "Chewbacca assigned to the factory and there is a shipment of 4" +
                         " chassis and another shipment of 2 wheels and 3 chassis in the cargo bay"
@@ -189,23 +200,24 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
             }
 
             When("There is an order given to Chewbacca to unpack shipment in the cargo bay") {
-                events = fold(state, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
+                resultingEvents = fold(state, UnpackAndInventoryShipmentInCargoBay(Employee("Chewbacca")))
             }
 
             Then("Chewbacca unpacked the cargo bay with a 4-chassis pack, 2 wheels-pack and 3-chassis pack") {
-                events shouldContain ShipmentUnpackedInCargoBay(
+                resultingEvents.shouldBeRight()
+                resultingEvents.map { it shouldContain ShipmentUnpackedInCargoBay(
                     Employee("Chewbacca"), listOf(
                         CarPartPackage(CarPart("chassis"), 4),
                         CarPartPackage(CarPart("wheel"), 2),
                         CarPartPackage(CarPart("chassis"), 3),
                     )
-                )
+                ) }
             }
         }
 
         Scenario("An employee may unpack shipments in the cargo bay once a day") {
-            lateinit var exception: Throwable
             lateinit var state: List<FactoryDomainEvent>
+            lateinit var resultingEvents: Either<String, List<FactoryDomainEvent>>
             Given("Yoda already unpack shipments the cargo bay today") {
                 state = listOf(
                     EmployeeAssignedToFactory(Employee("Yoda")),
@@ -228,18 +240,22 @@ object UnpackShipmentInTheCargoBayFeature : Spek({
                 )
             }
 
-            When("Yoda is ordered to unpack the shipment in the cargo bay, There should be an error") {
-                exception = shouldThrow<IllegalStateException> {
+            When("Yoda is ordered to unpack the shipment in the cargo bay") {
+                resultingEvents =
                     fold(state, UnpackAndInventoryShipmentInCargoBay(Employee("Yoda")))
-                }
+            }
+
+            Then("There should be an error") {
+                resultingEvents.shouldBeLeft()
             }
 
             And(
                 "The error message should contains \" Yoda may only unpack and inventory all " +
                         "Shipments in the CargoBay once a day \" "
             ) {
-                exception.message shouldContain
+                resultingEvents.mapLeft { it shouldContain
                         "Yoda may only unpack and inventory all Shipments in the CargoBay once a day"
+                }
             }
         }
 

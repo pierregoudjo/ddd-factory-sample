@@ -8,12 +8,18 @@ plugins {
 group = "xyz.goudjo.btw-samples"
 version = "1.0-SNAPSHOT"
 
+val arrowVersion = "0.13.0"
+val speckVersion = "2.0.15"
+val kotestVersion = "4.4.3"
+
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.3")
+    implementation("io.arrow-kt:arrow-core:$arrowVersion")
 
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.15")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.15")
-    testImplementation ("io.kotest:kotest-assertions-core:4.4.3")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:$speckVersion")
+    testImplementation ("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation ("io.kotest:kotest-assertions-arrow:$kotestVersion")
+    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$speckVersion")
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.30")
 }
 
