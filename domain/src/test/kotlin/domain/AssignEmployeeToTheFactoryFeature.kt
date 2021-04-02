@@ -1,9 +1,10 @@
+package domain
+
 import arrow.core.Either
 import io.kotest.assertions.arrow.either.shouldBeLeft
 import io.kotest.assertions.arrow.either.shouldBeRight
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.string.shouldContain
-import model.Employee
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.gherkin.Feature
 

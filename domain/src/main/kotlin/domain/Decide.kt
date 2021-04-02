@@ -1,7 +1,4 @@
-import model.CarModel
-import model.Curse
-import model.Employee
-import model.Shipment
+package domain
 
 private fun thisEmployeeIsNamedBender(employee: Employee) = employee == Employee("Bender")
 

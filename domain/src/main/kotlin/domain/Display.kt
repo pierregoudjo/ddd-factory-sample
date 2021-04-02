@@ -1,3 +1,5 @@
+package domain
+
 import arrow.core.Either
 
 internal fun doPaperWork(workName: String) {

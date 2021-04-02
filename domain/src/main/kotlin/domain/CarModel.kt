@@ -1,4 +1,4 @@
-package model
+package domain
 
 enum class CarModel {
     MODEL_T {

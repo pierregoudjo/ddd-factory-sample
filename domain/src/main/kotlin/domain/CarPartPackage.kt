@@ -1,4 +1,4 @@
-package model
+package domain
 
 typealias CarPartPackages = List<CarPartPackage>
 

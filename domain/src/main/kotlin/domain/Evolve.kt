@@ -1,9 +1,4 @@
-package internal
-
-import Factory
-import model.CarPartPackages
-import model.Employee
-import model.Shipment
+package domain
 
 internal fun unpackShipment(cartPackages: CarPartPackages, employee: Employee, factory: Factory): Factory {
     val elementsToAddToInventory = cartPackages

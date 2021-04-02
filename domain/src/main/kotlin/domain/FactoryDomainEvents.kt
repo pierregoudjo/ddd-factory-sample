@@ -1,8 +1,4 @@
-import model.Curse
-import model.Shipment
-import model.Employee
-import model.CarPartPackages
-import model.CarModel
+package domain
 
 sealed class FactoryDomainEvent
 

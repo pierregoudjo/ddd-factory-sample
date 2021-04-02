@@ -1,6 +1,4 @@
-import model.CarModel
-import model.Employee
-import model.Shipment
+package domain
 
 sealed class FactoryCommand
 

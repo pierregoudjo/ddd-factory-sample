@@ -1,12 +1,6 @@
+package domain
+
 import arrow.core.Either
-import internal.addShipment
-import internal.registerEmployee
-import internal.unpackShipment
-import internal.updateInventory
-import internal.updateListofEmployeeWhoBuiltCars
-import model.Employee
-import model.Inventory
-import model.Shipment
 
 data class Factory(
     val listOfEmployeeNames: List<Employee>,
